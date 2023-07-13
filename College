@@ -1,0 +1,530 @@
+import tkinter as tk
+import mysql.connector
+import random
+
+def gencid():
+    a=random.randint(1,9)
+    b=random.randint(1,9)
+    c=random.randint(1,9)
+    d=random.randint(1,9)
+    num="GRA"+str(a)+str(b)+str(c)+str(d)
+    return num
+
+def emailcheck(Email):
+    con = mysql.connector.connect(host='localhost', database='college', user='root', password='')
+    if con.is_connected():
+        qry = "select Email from graphic_era where Email ='{}'".format(Email)
+        c1 = con.cursor()
+        c1.execute(qry)
+        rows = c1.fetchall()
+        if c1.rowcount>0:
+            x=True
+        else:
+            x=False
+        return x
+
+def passcheck(Password):
+    con = mysql.connector.connect(host='localhost', database='college', user='root', password='')
+    if con.is_connected():
+        qry = "select Password from graphic_era where Password='{}'".format(Password)
+        c1 = con.cursor()
+        c1.execute(qry)
+        rows = c1.fetchall()
+        if c1.rowcount>0:
+            x=True
+        else:
+            x=False
+        return x
+
+def checkcid(cid):
+    con = mysql.connector.connect(host='localhost', database='college', user='root', password='')
+    if con.is_connected():
+        qry = "select college_id from graphic_era where college_id='{}'".format(cid)
+        c1 = con.cursor()
+        c1.execute(qry)
+        rows = c1.fetchall()
+        if c1.rowcount>0:
+            x=True
+        else:
+            x=False
+        return x
+
+class MainMenu(tk.Frame):
+    def __init__(self, master=None):
+        super().__init__(master)
+        self.master = master
+        self.grid()
+        self.label1 = tk.Label(self, text="Graphic Era(Deemed to be University)",padx=235,pady=47, fg='black', bg='#FF00FF',font=('arial',25))
+        self.label1.pack(pady=1.5)
+        self.sign_in_button = tk.Button(self, text='SIGN IN', command=self.Sign_in, padx=62, pady=18,bg='#FFCCFF', font=('arial', 15))
+        self.sign_in_button.pack(pady=1.5)
+        self.log_in_button = tk.Button(self, text='LOG IN', command=self.Log_in, padx=62, pady=18, bg='#FFCCFF',font=('arial', 15))
+        self.log_in_button.pack(pady=1.5)
+        self.help_button = tk.Button(self, text='HELP', command="#", padx=62, pady=18, bg='#FFCCFF',font=('arial', 15))
+        self.help_button.pack(pady=1.5)
+        self.quit_button = tk.Button(self, text="Quit", command=self.master.quit)
+        self.quit_button.pack(pady=5)
+        self.label2 = tk.Label(self, text="This is the Local ERP of Graphic Era (Deemed to be University)"
+                                          "enquiry@geu.ac.in",font=('arial',10))
+        self.label2.pack(pady=1.5)
+
+    def Sign_in(self):
+        self.master.switch_frame(Sign_in)
+    def Log_in(self):
+        self.master.switch_frame(Log_in)
+    def help(self):
+        self.master.switch_frame("#")
+
+class Sign_in(tk.Frame):
+    def __init__(self, master=None):
+        super().__init__(master)
+        self.master = master
+        self.grid()
+        self.label1 = tk.Label(self, text="Graphic Era(Deemed to be University)",padx=235,pady=47, fg='black', bg='#FF00FF',font=('arial',25))
+        self.label1.pack(pady=1.5)
+        self.label2 = tk.Label(self, text="New Registration", font=("Arial", 20))
+        self.label2.pack(pady=10)
+        self.Name_label = tk.Label(self, text="Enter Your Name:")
+        self.Name_label.pack()
+        self.Name_entry = tk.Entry(self)
+        self.Name_entry.pack(pady=5)
+        self.rnum_label = tk.Label(self, text="Enter Your Roll Number:")
+        self.rnum_label.pack()
+        self.rnum_entry = tk.Entry(self)
+        self.rnum_entry.pack(pady=5)
+        self.email_label = tk.Label(self, text="Enter Your Email ID:")
+        self.email_label.pack()
+        self.email_entry = tk.Entry(self)
+        self.email_entry.pack(pady=5)
+        self.pass_label = tk.Label(self, text="Enter Your Password:")
+        self.pass_label.pack()
+        self.pass_entry = tk.Entry(self)
+        self.pass_entry.pack(pady=5)
+        self.add_button = tk.Button(self, text='ADD', command=self.add, padx=62, pady=18, bg='#CC0000', font=('arial', 15))
+        self.add_button.pack(pady=1.5)
+        self.back_button = tk.Button(self, text="Back to Main Menu", command=self.go_to_main_menu)
+        self.back_button.pack(pady=8)
+
+    def add(self):
+        con = mysql.connector.connect(host='localhost', database='college', user='root', password='')
+        if con.is_connected():
+            Name=self.Name_entry.get()
+            Email=self.email_entry.get()
+            Roll_num=self.rnum_entry.get()
+            Password=self.pass_entry.get()
+            college_id=gencid()
+            mark_h=mark_e=mark_m=mark_s=mark_a=0
+            qry = "insert into graphic_era values('{}','{}',{},'{}','{}',{},{},{},{},{})".format(Name,Email,Roll_num,Password,college_id,mark_h,mark_e,mark_m,mark_s,mark_a)
+            c1 = con.cursor()
+            c1.execute(qry)
+            con.commit()
+            con.close
+            self.label1 = tk.Label(self, text="Thank you for choosing our College😊😊"
+                                              "congratulations your Admission is conform", font=("Arial", 10))
+            self.label1.pack(pady=5)
+            self.label2 = tk.Label(self, text="Your College ID is '{}'".format(college_id), font=("Arial", 10))
+            self.label2.pack(pady=5)
+        else:
+            self.label = tk.Label(self, text="Server Error(MySQL is not Connected)", font=("Arial", 10))
+            self.label.pack(pady=5)
+            con.close
+
+    def go_to_main_menu(self):
+        self.master.switch_frame(MainMenu)
+
+class Log_in(tk.Frame):
+    def __init__(self, master=None):
+        super().__init__(master)
+        self.master = master
+        self.grid()
+        self.label1 = tk.Label(self, text="Graphic Era(Deemed to be University)", padx=235, pady=47, fg='black',bg='#FF00FF', font=('arial', 25))
+        self.label1.pack(pady=1.5)
+        self.label2 = tk.Label(self, text="Student Portal", font=("Arial", 20))
+        self.label2.pack(pady=10)
+        self.email_label = tk.Label(self, text="Enter Your Email ID:")
+        self.email_label.pack()
+        self.email_entry = tk.Entry(self)
+        self.email_entry.pack(pady=5)
+        self.label2.pack(pady=10)
+        self.pass_label = tk.Label(self, text="Enter Your Password:")
+        self.pass_label.pack()
+        self.pass_entry = tk.Entry(self)
+        self.pass_entry.pack(pady=5)
+        self.search_button = tk.Button(self, text='SEARCH', command=self.search, padx=62, pady=18, bg='#CC0000',font=('arial', 15))
+        self.search_button.pack(pady=1.5)
+        self.forpass_button = tk.Button(self, text='FORGET PASSWORD', command=self.forpass, padx=62, pady=18, bg='#CC0000',font=('arial', 15))
+        self.forpass_button.pack(pady=1.5)
+        self.back_button = tk.Button(self, text="Back to Main Menu", command=self.go_to_main_menu)
+        self.back_button.pack(pady=8)
+
+    def search(self):
+        con = mysql.connector.connect(host='localhost', database='college', user='root', password='')
+        if con.is_connected():
+            Email = self.email_entry.get()
+            Password = self.pass_entry.get()
+            if emailcheck(Email):
+                if passcheck(Password):
+                    n = Email.partition('@')
+                    if n[2] == "gmail.com":
+                        self.master.switch_frame(student)
+
+                    elif n[2] == "gra.ac.in":
+                        self.master.switch_frame(teacher)
+                    else:
+                        self.label = tk.Label(self, text="Please connect to college. Your email is invalid",
+                                              font=("Arial", 10))
+                        self.label.pack(pady=5)
+                else:
+                    self.label = tk.Label(self, text="Incorrect password", font=("Arial", 10))
+                    self.label.pack(pady=5)
+            else:
+                self.label = tk.Label(self, text="Incorrect email", font=("Arial", 10))
+                self.label.pack(pady=5)
+        else:
+            self.label = tk.Label(self, text="Server Error (MySQL is not connected)", font=("Arial", 10))
+            self.label.pack(pady=5)
+            con.close()
+
+    def forpass(self):
+        self.master.switch_frame(forgetpass)
+
+    def go_to_main_menu(self):
+        self.master.switch_frame(MainMenu)
+
+class student(tk.Frame):
+    def __init__(self, master=None):
+        super().__init__(master)
+        self.master = master
+        self.grid()
+        self.label1 = tk.Label(self, text="Graphic Era(Deemed to be University)", padx=235, pady=47, fg='black',bg='#FF00FF', font=('arial', 25))
+        self.label1.pack(pady=1.5)
+        self.label2 = tk.Label(self, text="Welcome to Student Portal", font=("Arial", 20))
+        self.label2.pack(pady=10)
+        self.Show_marks_button = tk.Button(self, text='SHOW MARKS', command=self.sh_ma, padx=62, pady=18, bg='#FFCCFF',font=('arial', 15))
+        self.Show_marks_button.pack(pady=1.5)
+        self.Show_detail_button = tk.Button(self, text='SHOW DETAIL', command=self.sh_de, padx=62, pady=18, bg='#FFCCFF',font=('arial', 15))
+        self.Show_detail_button.pack(pady=1.5)
+        self.back_button = tk.Button(self, text="Back to Main Menu", command=self.go_to_main_menu)
+        self.back_button.pack(pady=8)
+
+    def go_to_main_menu(self):
+        self.master.switch_frame(MainMenu)
+    def sh_ma(self):
+        self.master.switch_frame(show_marks)
+    def sh_de(self):
+        self.master.switch_frame(show_detail)
+
+class show_marks(tk.Frame):
+    def __init__(self, master=None):
+        super().__init__(master)
+        self.master = master
+        self.grid()
+        self.label1 = tk.Label(self, text="Graphic Era(Deemed to be University)", padx=235, pady=47, fg='black',bg='#FF00FF', font=('arial', 25))
+        self.label1.pack(pady=1.5)
+        self.label2 = tk.Label(self, text="Welcome to Student Portal", font=("Arial", 20))
+        self.label2.pack(pady=10)
+        self.cid_label = tk.Label(self, text="Enter Your College ID:")
+        self.cid_label.pack()
+        self.cid_entry = tk.Entry(self)
+        self.cid_entry.pack(pady=5)
+        self.show_button = tk.Button(self, text='SHOW', command=self.sh, padx=62, pady=18, bg='#CC0000',font=('arial', 15))
+        self.show_button.pack(pady=1.5)
+        self.back_button = tk.Button(self, text="Back to Main Menu", command=self.go_to_main_menu)
+        self.back_button.pack(pady=8)
+
+    def go_to_main_menu(self):
+        self.master.switch_frame(MainMenu)
+
+    def sh(self):
+        con = mysql.connector.connect(host='localhost', database='college', user='root', password='')
+        if con.is_connected():
+            cid = self.cid_entry.get()
+            if checkcid(cid):
+                qry = "select * from graphic_era where college_id='{}'".format(cid)
+                c1 = con.cursor()
+                c1.execute(qry)
+                rows = c1.fetchall()
+                for x in rows:
+                    self.label1 = tk.Label(self, text="your Marks in Hindi is --> {}".format(x[5]), font=("Arial", 10))
+                    self.label1.pack(pady=5)
+                    self.label2 = tk.Label(self, text="your Marks in English is --> {}".format(x[6]), font=("Arial", 10))
+                    self.label2.pack(pady=5)
+                    self.label3 = tk.Label(self, text="your Marks in Math is --> {}".format(x[7]), font=("Arial", 10))
+                    self.label3.pack(pady=5)
+                    self.label4 = tk.Label(self, text="your Marks in Science is --> {}".format(x[8]), font=("Arial", 10))
+                    self.label4.pack(pady=5)
+                    self.label5 = tk.Label(self, text="your Marks in Art is --> {}".format(x[9]), font=("Arial", 10))
+                    self.label5.pack(pady=5)
+                c1.close
+            else:
+                self.label = tk.Label(self, text="Incorrect College ID", font=("Arial", 10))
+                self.label.pack(pady=5)
+        else:
+            self.label = tk.Label(self, text="Server Error (MySQL is not connected)", font=("Arial", 10))
+            self.label.pack(pady=5)
+            con.close()
+
+class show_detail(tk.Frame):
+    def __init__(self, master=None):
+        super().__init__(master)
+        self.master = master
+        self.grid()
+        self.label1 = tk.Label(self, text="Graphic Era(Deemed to be University)", padx=235, pady=47, fg='black',bg='#FF00FF', font=('arial', 25))
+        self.label1.pack(pady=1.5)
+        self.label2 = tk.Label(self, text="Welcome to Student Portal", font=("Arial", 20))
+        self.label2.pack(pady=10)
+        self.cid_label = tk.Label(self, text="Enter Your College ID:")
+        self.cid_label.pack()
+        self.cid_entry = tk.Entry(self)
+        self.cid_entry.pack(pady=5)
+        self.show_button = tk.Button(self, text='SHOW', command=self.shd, padx=62, pady=18, bg='#CC0000',font=('arial', 15))
+        self.show_button.pack(pady=1.5)
+        self.back_button = tk.Button(self, text="Back to Main Menu", command=self.go_to_main_menu)
+        self.back_button.pack(pady=8)
+
+    def go_to_main_menu(self):
+        self.master.switch_frame(MainMenu)
+
+    def shd(self):
+        con = mysql.connector.connect(host='localhost', database='college', user='root', password='')
+        if con.is_connected():
+            cid = self.cid_entry.get()
+            if checkcid(cid):
+                qry = "select * from graphic_era where college_id='{}'".format(cid)
+                c1 = con.cursor()
+                c1.execute(qry)
+                rows = c1.fetchall()
+                for x in rows:
+                    self.label1 = tk.Label(self, text="your Name is --> {}".format(x[0]), font=("Arial", 10))
+                    self.label1.pack(pady=5)
+                    self.label2 = tk.Label(self, text="your Email is --> {}".format(x[1]), font=("Arial", 10))
+                    self.label2.pack(pady=5)
+                    self.label3 = tk.Label(self, text="your Roll Number is --> {}".format(x[2]), font=("Arial", 10))
+                    self.label3.pack(pady=5)
+                c1.close
+            else:
+                self.label = tk.Label(self, text="Incorrect College ID", font=("Arial", 10))
+                self.label.pack(pady=5)
+        else:
+            self.label = tk.Label(self, text="Server Error (MySQL is not connected)", font=("Arial", 10))
+            self.label.pack(pady=5)
+            con.close()
+
+class teacher(tk.Frame):
+    def __init__(self, master=None):
+        super().__init__(master)
+        self.master = master
+        self.grid()
+        self.label1 = tk.Label(self, text="Graphic Era(Deemed to be University)", padx=235, pady=47, fg='black',bg='#FF00FF', font=('arial', 25))
+        self.label1.pack(pady=1.5)
+        self.label2 = tk.Label(self, text="Welcome to Teacher Portal", font=("Arial", 20))
+        self.label2.pack(pady=10)
+        self.Add_marks_button = tk.Button(self, text='ADD MARKS', command=self.ad_ma, padx=62, pady=18, bg='#FFCCFF',font=('arial', 15))
+        self.Add_marks_button.pack(pady=1.5)
+        self.delet_button = tk.Button(self, text='Delete', command=self.del_st, padx=62, pady=18, bg='#FFCCFF',font=('arial', 15))
+        self.delet_button.pack(pady=1.5)
+        self.back_button = tk.Button(self, text="Back to Main Menu", command=self.go_to_main_menu)
+        self.back_button.pack(pady=8)
+
+    def go_to_main_menu(self):
+        self.master.switch_frame(MainMenu)
+    def ad_ma(self):
+        self.master.switch_frame(add_marks)
+    def del_st(self):
+        self.master.switch_frame(Del_student)
+
+class add_marks(tk.Frame):
+    def __init__(self, master=None):
+        super().__init__(master)
+        self.master = master
+        self.grid()
+        self.label1 = tk.Label(self, text="Graphic Era(Deemed to be University)", padx=235, pady=47, fg='black',bg='#FF00FF', font=('arial', 25))
+        self.label1.pack(pady=1.5)
+        self.label2 = tk.Label(self, text="Welcome to Teacher Portal", font=("Arial", 20))
+        self.label2.pack(pady=10)
+        self.cid_label = tk.Label(self, text="Enter Your College ID:")
+        self.cid_label.pack()
+        self.cid_entry = tk.Entry(self)
+        self.cid_entry.pack(pady=5)
+        self.Search_button = tk.Button(self, text='Search', command=self.s, padx=62, pady=18, bg='#CC0000',font=('arial', 15))
+        self.Search_button.pack(pady=1.5)
+        self.back_button = tk.Button(self, text="Back to Main Menu", command=self.go_to_main_menu)
+        self.back_button.pack(pady=8)
+
+    def go_to_main_menu(self):
+        self.master.switch_frame(MainMenu)
+
+    def s(self):
+        con = mysql.connector.connect(host='localhost', database='college', user='root', password='')
+        if con.is_connected():
+            cid = self.cid_entry.get()
+            if checkcid(cid):
+                self.mark_h_label = tk.Label(self, text="Enter Marks In Hindi:")
+                self.mark_h_label.pack()
+                self.mark_h_entry = tk.Entry(self)
+                self.mark_h_entry.pack(pady=5)
+                self.mark_e_label = tk.Label(self, text="Enter Marks in English:")
+                self.mark_e_label.pack()
+                self.mark_e_entry = tk.Entry(self)
+                self.mark_e_entry.pack(pady=5)
+                self.mark_m_label = tk.Label(self, text="Enter Marks in Maths:")
+                self.mark_m_label.pack()
+                self.mark_m_entry = tk.Entry(self)
+                self.mark_m_entry.pack(pady=5)
+                self.mark_s_label = tk.Label(self, text="Enter Marks in Science:")
+                self.mark_s_label.pack()
+                self.mark_s_entry = tk.Entry(self)
+                self.mark_s_entry.pack(pady=5)
+                self.mark_a_label = tk.Label(self, text="Enter Marks in Art:")
+                self.mark_a_label.pack()
+                self.mark_a_entry = tk.Entry(self)
+                self.mark_a_entry.pack(pady=5)
+                self.add_button = tk.Button(self, text='Add', command=self.add, padx=62, pady=18, bg='#CC0000',font=('arial', 15))
+                self.add_button.pack(pady=1.5)
+            else:
+                self.label = tk.Label(self, text="Incorrect College ID", font=("Arial", 10))
+                self.label.pack(pady=5)
+        else:
+            self.label = tk.Label(self, text="Server Error (MySQL is not connected)", font=("Arial", 10))
+            self.label.pack(pady=5)
+            con.close()
+    def add(self):
+        con = mysql.connector.connect(host='localhost', database='college', user='root', password='')
+        if con.is_connected():
+            mark_h = self.mark_h_entry.get()
+            mark_e = self.mark_e_entry.get()
+            mark_m = self.mark_m_entry.get()
+            mark_s = self.mark_s_entry.get()
+            mark_a = self.mark_a_entry.get()
+            cid = self.cid_entry.get()
+
+            qry1 = "update graphic_era set mark_h=mark_h+{} where college_id='{}'".format(mark_h,cid)
+            qry2 = "update graphic_era set mark_e=mark_e+{} where college_id='{}'".format(mark_e, cid)
+            qry3 = "update graphic_era set mark_m=mark_m+{} where college_id='{}'".format(mark_m, cid)
+            qry4 = "update graphic_era set mark_s=mark_s+{} where college_id='{}'".format(mark_s, cid)
+            qry5 = "update graphic_era set mark_a=mark_a+{} where college_id='{}'".format(mark_a, cid)
+
+            c1 = con.cursor()
+            c1.execute(qry1)
+            c1.execute(qry2)
+            c1.execute(qry3)
+            c1.execute(qry4)
+            c1.execute(qry5)
+            con.commit()
+            con.close
+
+            self.label = tk.Label(self, text="Marks Added", font=("Arial", 10))
+            self.label.pack(pady=5)
+        else:
+            self.label = tk.Label(self, text="Server Error (MySQL is not connected)", font=("Arial", 10))
+            self.label.pack(pady=5)
+            con.close()
+
+class Del_student(tk.Frame):
+    def __init__(self, master=None):
+        super().__init__(master)
+        self.master = master
+        self.grid()
+        self.label1 = tk.Label(self, text="Graphic Era(Deemed to be University)", padx=235, pady=47, fg='black',bg='#FF00FF', font=('arial', 25))
+        self.label1.pack(pady=1.5)
+        self.label2 = tk.Label(self, text="Welcome to Teacher Portal", font=("Arial", 20))
+        self.label2.pack(pady=10)
+        self.cid_label = tk.Label(self, text="Enter Your College ID:")
+        self.cid_label.pack()
+        self.cid_entry = tk.Entry(self)
+        self.cid_entry.pack(pady=5)
+        self.delete_button = tk.Button(self, text='Delete Student', command=self.d, padx=62, pady=18, bg='#CC0000',font=('arial', 15))
+        self.delete_button.pack(pady=1.5)
+        self.back_button = tk.Button(self, text="Back to Main Menu", command=self.go_to_main_menu)
+        self.back_button.pack(pady=8)
+
+    def go_to_main_menu(self):
+        self.master.switch_frame(MainMenu)
+
+    def d(self):
+        con = mysql.connector.connect(host='localhost', database='college', user='root', password='')
+        if con.is_connected():
+            cid = self.cid_entry.get()
+            qry = "delete from graphic_era where college_id='{}'".format(cid)
+            c1 = con.cursor()
+            c1.execute(qry)
+            con.commit()
+            con.close
+            self.label = tk.Label(self, text='Student is Remove From the Clg', font=("Arial", 10))
+            self.label.pack(pady=5)
+        else:
+            self.label = tk.Label(self, text="Server Error (MySQL is not connected)", font=("Arial", 10))
+            self.label.pack(pady=5)
+            con.close()
+
+class forgetpass(tk.Frame):
+    def __init__(self, master=None):
+        super().__init__(master)
+        self.master = master
+        self.grid()
+        self.label1 = tk.Label(self, text="Graphic Era(Deemed to be University)", padx=235, pady=47, fg='black',bg='#FF00FF', font=('arial', 25))
+        self.label1.pack(pady=1.5)
+        self.label2 = tk.Label(self, text="Password portal", font=("Arial", 20))
+        self.label2.pack(pady=10)
+        self.email_label = tk.Label(self, text="Enter Your Email ID:")
+        self.email_label.pack()
+        self.email_entry = tk.Entry(self)
+        self.email_entry.pack(pady=5)
+        self.label2.pack(pady=10)
+        self.cid_label = tk.Label(self, text="Enter Your College ID:")
+        self.cid_label.pack()
+        self.cid_entry = tk.Entry(self)
+        self.cid_entry.pack(pady=5)
+        self.forpass_button = tk.Button(self, text='FORGET PASSWORD', command=self.fop, padx=62, pady=18, bg='#CC0000',font=('arial', 15))
+        self.forpass_button.pack(pady=1.5)
+        self.back_button = tk.Button(self, text="Back to Main Menu", command=self.go_to_main_menu)
+        self.back_button.pack(pady=8)
+
+    def go_to_main_menu(self):
+        self.master.switch_frame(MainMenu)
+
+    def fop(self):
+        con = mysql.connector.connect(host='localhost', database='college', user='root', password='')
+        if con.is_connected():
+            Email = self.email_entry.get()
+            cid = self.cid_entry.get()
+            if emailcheck(Email):
+                if checkcid(cid):
+                    qry = "select * from graphic_era where college_id='{}'".format(cid)
+                    c1 = con.cursor()
+                    c1.execute(qry)
+                    rows = c1.fetchall()
+                    for x in rows:
+                        self.label = tk.Label(self, text="your ERP Password is --> {}".format(x[3]), font=("Arial", 10))
+                        self.label.pack(pady=5)
+                    c1.close
+                else:
+                    self.label = tk.Label(self, text="Incorrect College ID", font=("Arial", 10))
+                    self.label.pack(pady=5)
+            else:
+                self.label = tk.Label(self, text="Incorrect email", font=("Arial", 10))
+                self.label.pack(pady=5)
+        else:
+            self.label = tk.Label(self, text="Server Error (MySQL is not connected)", font=("Arial", 10))
+            self.label.pack(pady=5)
+            con.close()
+
+class App(tk.Tk):
+    def __init__(self):
+        super().__init__()
+        self.title("Graphic Era(Deemed to be University)")
+        self.geometry("570x600")
+        self.frames = {}
+        for F in (MainMenu, Sign_in, Log_in , student , teacher , forgetpass , show_marks , show_detail ,add_marks ,Del_student):
+            frame = F(self)
+            self.frames[F] = frame
+            frame.grid(row=0, column=0, sticky="nsew")
+        self.switch_frame(MainMenu)
+
+    def switch_frame(self, frame_class):
+        frame = self.frames[frame_class]
+        frame.tkraise()
+
+if __name__ == "__main__":
+    app = App()
+    app.mainloop()
